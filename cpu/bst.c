@@ -1,6 +1,5 @@
 /* @auth : Arjun Krishna
  * @desc : Non-concurrent implementation of BST
- 					 [Runs on CPU]
  */
 
 #include <stdio.h>
@@ -28,8 +27,6 @@ node* insert(node* root, int key) {
 		root->left  = insert(root->left, key);
 	else 
 		root->right = insert(root->right, key);
-
-	return root;
 }
 
 node* min_BST(node* root) {
@@ -58,11 +55,19 @@ node* delete(node* root, int key) {
 			return tmp;
 		}
 		// successor
-		node* tmp = min_BST(root->right);
+		node *tmp = min_BST(root->right);
 		root->data = tmp->data;
 		root->right = delete(root->right, tmp->data);
 	}
 	return root;
+}
+
+node* find(node* root, int key) {
+	if (root == NULL) return NULL;
+
+	if (root->data == key) return root;
+	else if (root->data < key) return find(root->left, key);
+	else return find(root->right, key);
 }
 
 int main(void) {
