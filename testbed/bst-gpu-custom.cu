@@ -29,6 +29,8 @@ __global__ void custom_kernel() {
 	if (tid == 0) {
 		printf("In-order\n");
 		in_order(root);
+		printf("Pre-order\n");
+		pre_order(root);
 	}
 }
 
