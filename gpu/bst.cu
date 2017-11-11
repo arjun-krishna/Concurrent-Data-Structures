@@ -11,7 +11,7 @@ typedef struct node {
 
 void lock(node* n) {
 	do {
-		old = atomicCAS(&n->sema, 0, 1);
+		int old = atomicCAS(&n->sema, 0, 1);
 	} while (old == 1);
 }
 
@@ -23,7 +23,7 @@ __device__ node* new_node(int val) {
 	node *tmp = (node *) malloc(sizeof(node));
 	tmp->data = val;
 	tmp->left = tmp->right = NULL;
-	tmp->lock = 0;
+	tmp->sema = 0;
 	return tmp;
 }
 
@@ -73,43 +73,43 @@ __device__ node* min_BST(node* root) {
 	return tmp;
 }
 
-__device__ void delete(node* root, int key) {
-	if (root == NULL) return;
+// __device__ void delete(node* root, int key) {
+// 	if (root == NULL) return;
 
-	lock(root);
+// 	lock(root);
 
-	if (root->data == key) {				// The node to delete 
+// 	if (root->data == key) {				// The node to delete 
 		
-	} else if (key < root->data) {
-		unlock(root);
-		delete(root->left, key);
-	}
-	else {
-		unlock(root);
-		delete(root->right, key);
-	}
+// 	} else if (key < root->data) {
+// 		unlock(root);
+// 		delete(root->left, key);
+// 	}
+// 	else {
+// 		unlock(root);
+// 		delete(root->right, key);
+// 	}
 
-	if (key < root->data) 
-		root->left  = delete(root->left, key);
-	else if (key > root->data) 
-		root->right = delete(root->right, key); 
-	else {
-		if (root->left == NULL) {
-			node* tmp = root->right;
-			free(root);
-			return tmp;
-		} 
-		else if (root->right == NULL) {
-			node* tmp = root->left;
-			free(root);
-			return tmp;
-		}
-		// successor
-		node *tmp = min_BST(root->right);
-		root->data = tmp->data;
-		root->right = delete(root->right, tmp->data);
-	}
-	return root;
-}
+// 	if (key < root->data) 
+// 		root->left  = delete(root->left, key);
+// 	else if (key > root->data) 
+// 		root->right = delete(root->right, key); 
+// 	else {
+// 		if (root->left == NULL) {
+// 			node* tmp = root->right;
+// 			free(root);
+// 			return tmp;
+// 		} 
+// 		else if (root->right == NULL) {
+// 			node* tmp = root->left;
+// 			free(root);
+// 			return tmp;
+// 		}
+// 		// successor
+// 		node *tmp = min_BST(root->right);
+// 		root->data = tmp->data;
+// 		root->right = delete(root->right, tmp->data);
+// 	}
+// 	return root;
+// }
 
 
