@@ -4,17 +4,17 @@
 
 #include "../gpu/bst.cu"
 
-__device__ node* root;
+__device__ node* root = NULL;
 
 __global__ void custom_kernel() {
 	
 	int tid = threadIdx.x;
 	if (tid == 0) {
-		root = NULL;
+		root = insert(root, 0);
 	}
 	__syncthreads();
 	switch (tid) {
-		case 0 : insert(root, 0); break;
+		case 0 : break;
 		case 1 : insert(root, 1); break;
 		case 2 : insert(root, 2); break;
 		case 3 : insert(root, 3); break;
