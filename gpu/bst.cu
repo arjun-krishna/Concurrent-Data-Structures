@@ -10,8 +10,9 @@ typedef struct node {
 } node;
 
 void lock(node* n) {
+	int old = 1;
 	do {
-		int old = atomicCAS(&n->sema, 0, 1);
+		old = atomicCAS(&n->sema, 0, 1);
 	} while (old == 1);
 }
 
