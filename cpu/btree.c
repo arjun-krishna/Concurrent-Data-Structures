@@ -107,6 +107,66 @@ node* find(node* root, int key) {
 	if (root->isLeaf) return NULL;
 	else return find(root->child[i], key);	
 }
+
+node* delete(node* root, int key) {
+	if (root == NULL) return NULL;
+
+	root->remove(k);
+
+	if (root->nkeys == 0) {
+		node *tmp = root;
+		if (root->isLeaf) root = NULL;
+		else root = root->child[0];
+		free(tmp);
+	}
+}
+
+void remove(node* root, int k)
+{
+    int idx = findKey(k);
+ 
+    // The key to be removed is present in this node
+    if (idx < n && keys[idx] == k)
+    {
+ 
+        // If the node is a leaf node - removeFromLeaf is called
+        // Otherwise, removeFromNonLeaf function is called
+        if (leaf)
+            removeFromLeaf(idx);
+        else
+            removeFromNonLeaf(idx);
+    }
+    else
+    {
+ 
+        // If this node is a leaf node, then the key is not present in tree
+        if (leaf)
+        {
+            cout << "The key "<< k <<" is does not exist in the tree\n";
+            return;
+        }
+ 
+        // The key to be removed is present in the sub-tree rooted with this node
+        // The flag indicates whether the key is present in the sub-tree rooted
+        // with the last child of this node
+        bool flag = ( (idx==n)? true : false );
+ 
+        // If the child where the key is supposed to exist has less that t keys,
+        // we fill that child
+        if (C[idx]->n < t)
+            fill(idx);
+ 
+        // If the last child has been merged, it must have merged with the previous
+        // child and so we recurse on the (idx-1)th child. Else, we recurse on the
+        // (idx)th child which now has atleast t keys
+        if (flag && idx > n)
+            C[idx-1]->remove(k);
+        else
+            C[idx]->remove(k);
+    }
+    return;
+}
+
  
 int main()
 {
