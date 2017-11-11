@@ -10,7 +10,7 @@ __global__ void custom_kernel() {
 	
 	int tid = threadIdx.x;
 	if (tid == 0) {
-		root = insert(root, 0);
+		insert(root, 0);
 	}
 	__syncthreads();
 	switch (tid) {
