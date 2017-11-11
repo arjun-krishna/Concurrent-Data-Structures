@@ -8,7 +8,7 @@ __global__ void custom_kernel() {
 	__shared__ node* root;
 	
 	int tid = threadIdx.x;
-	if (tid) {
+	if (tid == 0) {
 		root = NULL;
 	}
 	__syncthreads();
@@ -23,6 +23,10 @@ __global__ void custom_kernel() {
 		case 7 : insert(root, 7); break;
 		case 8 : insert(root, 8); break;
 		case 9 : insert(root, 9); break;
+	}
+	__syncthreads();
+	if (tid == 0) {
+		pre_order(root);
 	}
 }
 

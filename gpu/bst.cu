@@ -67,6 +67,17 @@ __device__ void insert(node* root, int key) {
 	}
 }
 
+__device__ void pre_order(node* root)
+{
+    if(root != NULL)
+    {
+        printf("%d ", root->data);
+        preOrder(root->left);
+        preOrder(root->right);
+    }
+		return;
+}
+
 __device__ node* min_BST(node* root) {
 	if (root == NULL) return NULL;
 	node* tmp = root;
