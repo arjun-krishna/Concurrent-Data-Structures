@@ -4,8 +4,9 @@
 
 #include "../gpu/bst.cu"
 
+__device__ node* root;
+
 __global__ void custom_kernel() {
-	__shared__ node* root;
 	
 	int tid = threadIdx.x;
 	if (tid == 0) {
@@ -26,7 +27,8 @@ __global__ void custom_kernel() {
 	}
 	__syncthreads();
 	if (tid == 0) {
-		pre_order(root);
+		printf("In-order\n");
+		in_order(root);
 	}
 }
 

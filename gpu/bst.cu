@@ -71,9 +71,20 @@ __device__ void pre_order(node* root)
 {
     if(root != NULL)
     {
-        printf("%d ", root->data);
-        preOrder(root->left);
-        preOrder(root->right);
+      printf("%d ", root->data);
+      pre_order(root->left);
+      pre_order(root->right);
+    }
+		return;
+}
+
+__device__ void in_order(node* root)
+{
+    if(root != NULL)
+    {
+      in_order(root->left);
+      printf("%d ", root->data);
+      in_order(root->right);
     }
 		return;
 }
