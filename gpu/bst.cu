@@ -9,14 +9,14 @@ typedef struct node {
 	int sema;
 } node;
 
-void lock(node* n) {
+__device__ void lock(node* n) {
 	int old = 1;
 	do {
 		old = atomicCAS(&n->sema, 0, 1);
 	} while (old == 1);
 }
 
-void unlock(node* n) {
+__device__ void unlock(node* n) {
 	n->sema = 0;
 }
 

@@ -34,6 +34,6 @@ __global__ void custom_kernel() {
 
 int main(int argc, char* argv[]) {
 	custom_kernel<<<1,10>>>();
-	cudaDeviceSyncronize();
+	cudaDeviceSynchronize();
 	return 0;
 }
