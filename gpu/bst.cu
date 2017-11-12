@@ -31,7 +31,7 @@ __device__ node* find(node* root, int key) {
 	if (root == NULL) return NULL;
 
 	if (root->data == key) return root;
-	else if (root->data < key) return find(root->left, key);
+	else if (root->data > key) return find(root->left, key);
 	else return find(root->right, key);
 }
 
@@ -101,43 +101,52 @@ __device__ node* min_BST(node* root) {
 	return tmp;
 }
 
-__device__ void delete(node* root, int key) {
-	if (root == NULL) return NULL;
+__device__ void bst_delete(node* root, int key) {
+	if (root == NULL) return;
 
-	lock(root);
+	int root_acquired = lock(root);
 
-	node* node2delete = find(root, key);
+	if (root_acquired) {
+		node* node2delete = find(root, key);
 
-	if (node2delete) {
-		node* parent = node2delete->parent;
-		if (parent) {
-			lock(parent);
-			unlock(root);
-			node* successor = min_BST(node2delete);
-			if (successor == NULL) {										// Leaf Node
-				if (node2delete->data < parent->data) {
-					parent->left = NULL;
+		if (node2delete) {
+			node* parent = node2delete->parent;
+			if (parent) {
+				
+				int parent_acquired = lock(parent);
+				unlock(root);
+				if (parent_acquired) {
+					node* successor = min_BST(node2delete);
+					if (successor == NULL) {										// Leaf Node
+						if (node2delete->data < parent->data) {
+							parent->left = NULL;
+						} else {
+							parent->right = NULL;
+						}
+						free(node2delete);
+					} 
+					else if (successor != NULL) {
+						node* parent_of_successor = successor->parent;
+						node2delete->data = successor->data;
+						if (successor->data < parent_of_successor->data) {
+							parent_of_successor->left = NULL;
+						} else {
+							parent_of_successor->right = NULL;
+						}
+						free(successor);
+					}
+					unlock(parent);
 				} else {
-					parent->right = NULL;
+					bst_delete(root, key);
 				}
-				free(node2delete);
-			} 
-			else if (successor != NULL) {
-				node* parent_of_successor = successor->parent;
-				node2delete->data = successor->data;
-				if (successor->data < parent_of_successor->data) {
-					parent_of_successor->left = NULL;
-				} else {
-					parent_of_successor->right = NULL;
-				}
-				free(successor);
+			} else {												// ROOT of tree involved!
+				// not handled!
 			}
-			unlock(parent);
-		} else {												// ROOT of tree involved!
-			// not handled!
+		} else {
+			unlock(root);
 		}
 	} else {
-		unlock(root);
+		bst_delete(root, key);
 	}
 }
 
