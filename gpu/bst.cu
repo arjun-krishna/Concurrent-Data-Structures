@@ -9,7 +9,7 @@ typedef struct node {
 	int sema;
 } node;
 
-__device__ void lock(node* n) {
+__device__ int lock(node* n) {
 	return !atomicExch(&n->sema, 1);
 	// int old = 1;
 	// do {
