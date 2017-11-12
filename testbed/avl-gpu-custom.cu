@@ -15,7 +15,7 @@ __global__ void custom_kernel() {
 	}
 	__syncthreads();
 	if (tid != 0) {
-		insert(root, tid);
+		coarse_insert(root, tid);
 	}
 	__syncthreads();
 	if (tid == 0) {

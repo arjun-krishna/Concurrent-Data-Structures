@@ -180,8 +180,12 @@ __device__ void rebalance(node* p, int key) {
 	}
 }
 
+__device__ void coarse_rebalance(node* root, int key) {
+	
+}
 
-__device__ void insert(node* root, int key) {
+
+__device__ void coarse_insert(node* root, int key) {
 
 	node* curr = root;
 	node* parent = NULL;
@@ -191,33 +195,35 @@ __device__ void insert(node* root, int key) {
 		return;
 	}
 
-	while (curr != NULL) {	
-
-		if (!atomicExch(&(curr->sema), 1)) {
-			parent = curr;
-			if (key < curr->data)
-				curr = curr->left;
-			else
-				curr = curr->right;	
-			if (curr == NULL) {
-				if (key < parent->data) {
-					parent->left = new_node(key, parent);
+	bool flag = true;
+	while (flag) {
+		if (!atomicExch(&MASTER_LOCK, 1)) {
+			while (curr != NULL) {	
+				parent = curr;
+				if (key < curr->data)
+					curr = curr->left;
+				else
+					curr = curr->right;	
+				if (curr == NULL) {
+					if (key < parent->data) {
+						parent->left = new_node(key, parent);
+					} else {
+						parent->right = new_node(key, parent);
+					}			
 				} else {
-					parent->right = new_node(key, parent);
-				}			
-			} else {
-				if (parent)
-					atomicExch(&(parent->sema), 0);
+					if (parent)
+						atomicExch(&(parent->sema), 0);
+				}
 			}
+			flag = false;
+			atomicExch(&MASTER_LOCK, 0);
 		}
 	}
-
-	atomicExch(&(parent->sema), 0);
-
-	if (key < parent->data)
-		rebalance(parent->left, key);
-	else
-		rebalance(parent->right, key);
+	
+	// if (key < parent->data)
+	// 	rebalance(parent->left, key);
+	// else
+	// 	rebalance(parent->right, key);
 }
 
 __device__ node* find(node* root, int key) {
