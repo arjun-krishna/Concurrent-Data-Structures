@@ -10,14 +10,7 @@ typedef struct node {
 } node;
 
 __device__ void lock(node* n) {
-	acquire_attempt = atomicExch(&n->sema, 1);
-	if (acquire_attempt) {
-		return;
-	} else {
-		int _g_ = 0;
-		while(_g_ < 100) _g_++;
- 		lock(n);
-	}
+	return !atomicExch(&n->sema, 1);
 	// int old = 1;
 	// do {
 	// 	old = atomicCAS(&n->sema, 0, 1);
@@ -53,26 +46,30 @@ __device__ void insert(node** root, int key) {
 		return;
 	}
 
-	lock(*root);
+	int acquired = lock(*root);
 
-	if (key < (*root)->data) {
-		if ((*root)->left == NULL) {			// Can be inserted to the immediate left
-			(*root)->left = new_node(key);
-			unlock(*root);
-			return;
-		} else {											// Release this Node and proceed
-			unlock(*root);
-			insert(&((*root)->left), key);
+	if (acquired) {
+		if (key < (*root)->data) {
+			if ((*root)->left == NULL) {			// Can be inserted to the immediate left
+				(*root)->left = new_node(key);
+				unlock(*root);
+				return;
+			} else {											// Release this Node and proceed
+				unlock(*root);
+				insert(&((*root)->left), key);
+			}
+		} else {
+			if ((*root)->right == NULL) {		// Can be inserted to the immediate right
+				(*root)->right = new_node(key);
+				unlock(*root);
+				return;
+			} else {
+				unlock(*root);								// Release this Node and proceed
+				insert(&((*root)->right), key);
+			}
 		}
 	} else {
-		if ((*root)->right == NULL) {		// Can be inserted to the immediate right
-			(*root)->right = new_node(key);
-			unlock(*root);
-			return;
-		} else {
-			unlock(*root);								// Release this Node and proceed
-			insert(&((*root)->right), key);
-		}
+		insert(root, key);
 	}
 }
 
