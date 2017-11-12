@@ -46,26 +46,27 @@ __device__ void insert(node** root, int key) {
 
 	lock(*root);
 
-	if (key < *root->data) {
-		if (*root->left == NULL) {			// Can be inserted to the immediate left
-			*root->left = new_node(key);
+	if (key < (*root)->data) {
+		if ((*root)->left == NULL) {			// Can be inserted to the immediate left
+			(*root)->left = new_node(key);
 			unlock(*root);
 			return;
 		} else {											// Release this Node and proceed
 			unlock(*root);
-			insert(*root->left, key);
+			insert((*root)->left, key);
 		}
 	} else {
-		if (*root->right == NULL) {		// Can be inserted to the immediate right
-			*root->right = new_node(key);
+		if ((*root)->right == NULL) {		// Can be inserted to the immediate right
+			(*root)->right = new_node(key);
 			unlock(*root);
 			return;
 		} else {
 			unlock(*root);								// Release this Node and proceed
-			insert(*root->right, key);
+			insert((*root)->right, key);
 		}
 	}
 }
+
 
 __device__ void pre_order(node* root)
 {
