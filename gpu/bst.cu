@@ -10,7 +10,14 @@ typedef struct node {
 } node;
 
 __device__ void lock(node* n) {
-	while(atomicExch(&n->sema, 1) != 0);
+	acquire_attempt = atomicExch(&n->sema, 1);
+	if (acquire_attempt) {
+		return;
+	} else {
+		int _g_ = 0;
+		while(_g_ < 100) _g_++;
+ 		lock(n);
+	}
 	// int old = 1;
 	// do {
 	// 	old = atomicCAS(&n->sema, 0, 1);
@@ -19,7 +26,7 @@ __device__ void lock(node* n) {
 
 __device__ void unlock(node* n) {
 	atomicExch(&n->sema, 0);
-	n->sema = 0;
+	// n->sema = 0;
 }
 
 __device__ node* new_node(int val) {
