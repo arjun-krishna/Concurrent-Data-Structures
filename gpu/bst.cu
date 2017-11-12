@@ -11,15 +11,10 @@ typedef struct node {
 
 __device__ int lock(node* n) {
 	return !atomicExch(&n->sema, 1);
-	// int old = 1;
-	// do {
-	// 	old = atomicCAS(&n->sema, 0, 1);
-	// } while (old == 1);
 }
 
 __device__ void unlock(node* n) {
 	atomicExch(&n->sema, 0);
-	// n->sema = 0;
 }
 
 __device__ node* new_node(int val) {
@@ -45,7 +40,7 @@ __device__ void insert(node** root, int key) {
 		*root = new_node(key); 
 		return;
 	}
-
+	L :
 	int acquired = lock(*root);
 
 	if (acquired) {
@@ -69,7 +64,8 @@ __device__ void insert(node** root, int key) {
 			}
 		}
 	} else {
-		insert(root, key);
+		goto L;
+		// insert(root, key);
 	}
 }
 
