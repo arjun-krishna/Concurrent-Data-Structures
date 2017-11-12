@@ -101,7 +101,7 @@ __device__ node* min_BST(node* root) {
 	return tmp;
 }
 
-__device__ int delete(node* root, int key) {
+__device__ void delete(node* root, int key) {
 	if (root == NULL) return NULL;
 
 	lock(root);
@@ -138,77 +138,75 @@ __device__ int delete(node* root, int key) {
 		}
 	} else {
 		unlock(root);
-		return 0;
 	}
-
-
-
-
-	if (root->data == key) {  // directly the node to be deleted!
-		// problematic
-	}
-
-	else {
-		if (root->left && root->left->data == key) {
-			lock(root);
-		} 
-		else if (root->right && root->right->data == key) {
-			lock(root);
-		} 
-		else if (root->left && root->data > key) {
-
-			root->left = delete(root->left, key);
-		} 
-
-	}
-
-
-
-
-
-	int acquired = lock(root);
-
-	if (acquired) {
-
-		if (root->data == key) {				// The node to delete 
-			if (root->left == NULL) {
-				node* tmp = root->right;
-				free(root);
-				return tmp;
-			}
-		} else if (key < root->data) {
-			unlock(root);
-			root->left = delete(root->left, key);
-		}
-		else {
-			unlock(root);
-			root->right = delete(root->right, key);
-		}
-	} else {
-		root = delete(root, key);
-	}
-
-	if (key < root->data) 
-		root->left  = delete(root->left, key);
-	else if (key > root->data) 
-		root->right = delete(root->right, key); 
-	else {
-		if (root->left == NULL) {
-			node* tmp = root->right;
-			free(root);
-			return tmp;
-		} 
-		else if (root->right == NULL) {
-			node* tmp = root->left;
-			free(root);
-			return tmp;
-		}
-		// successor
-		node *tmp = min_BST(root->right);
-		root->data = tmp->data;
-		root->right = delete(root->right, tmp->data);
-	}
-	return root;
 }
+
+
+
+	// if (root->data == key) {  // directly the node to be deleted!
+	// 	// problematic
+	// }
+
+	// else {
+	// 	if (root->left && root->left->data == key) {
+	// 		lock(root);
+	// 	} 
+	// 	else if (root->right && root->right->data == key) {
+	// 		lock(root);
+	// 	} 
+	// 	else if (root->left && root->data > key) {
+
+	// 		root->left = delete(root->left, key);
+	// 	} 
+
+	// }
+
+
+
+
+
+	// int acquired = lock(root);
+
+	// if (acquired) {
+
+	// 	if (root->data == key) {				// The node to delete 
+	// 		if (root->left == NULL) {
+	// 			node* tmp = root->right;
+	// 			free(root);
+	// 			return tmp;
+	// 		}
+	// 	} else if (key < root->data) {
+	// 		unlock(root);
+	// 		root->left = delete(root->left, key);
+	// 	}
+	// 	else {
+	// 		unlock(root);
+	// 		root->right = delete(root->right, key);
+	// 	}
+	// } else {
+	// 	root = delete(root, key);
+	// }
+
+	// if (key < root->data) 
+	// 	root->left  = delete(root->left, key);
+	// else if (key > root->data) 
+	// 	root->right = delete(root->right, key); 
+	// else {
+	// 	if (root->left == NULL) {
+	// 		node* tmp = root->right;
+	// 		free(root);
+	// 		return tmp;
+	// 	} 
+	// 	else if (root->right == NULL) {
+	// 		node* tmp = root->left;
+	// 		free(root);
+	// 		return tmp;
+	// 	}
+	// 	// successor
+	// 	node *tmp = min_BST(root->right);
+	// 	root->data = tmp->data;
+	// 	root->right = delete(root->right, tmp->data);
+	// }
+	// return root;
 
 
