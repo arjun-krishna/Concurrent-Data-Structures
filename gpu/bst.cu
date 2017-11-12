@@ -4,6 +4,7 @@
 
 typedef struct node {
 	int data;
+	struct node *parent;
 	struct node *left;
 	struct node *right;
 	int sema;
@@ -17,9 +18,10 @@ __device__ void unlock(node* n) {
 	atomicExch(&n->sema, 0);
 }
 
-__device__ node* new_node(int val) {
+__device__ node* new_node(int val, node* parent) {
 	node *tmp = (node *) malloc(sizeof(node));
 	tmp->data = val;
+	tmp->parent = parent;
 	tmp->left = tmp->right = NULL;
 	tmp->sema = 0;
 	return tmp;
@@ -37,7 +39,7 @@ __device__ node* find(node* root, int key) {
 __device__ void insert(node* root, int key) {
 
 	if (root == NULL) { 		 				// Empty Tree
-		root = new_node(key); 
+		root = new_node(key, NULL); 
 		return;
 	}
 	
@@ -46,7 +48,7 @@ __device__ void insert(node* root, int key) {
 	if (acquired) {
 		if (key < root->data) {
 			if (root->left == NULL) {			// Can be inserted to the immediate left
-				root->left = new_node(key);
+				root->left = new_node(key, root);
 				unlock(root);
 				return;
 			} else {											// Release this Node and proceed
@@ -55,7 +57,7 @@ __device__ void insert(node* root, int key) {
 			}
 		} else {
 			if (root->right == NULL) {		// Can be inserted to the immediate right
-				root->right = new_node(key);
+				root->right = new_node(key, root);
 				unlock(root);
 				return;
 			} else {
@@ -92,49 +94,121 @@ __device__ void in_order(node* root)
 }
 
 __device__ node* min_BST(node* root) {
+	node* tmp = root->right;
 	if (root == NULL) return NULL;
-	node* tmp = root;
+
 	while(tmp->left != NULL)	tmp = tmp->left;
 	return tmp;
 }
 
-// __device__ void delete(node* root, int key) {
-// 	if (root == NULL) return;
+__device__ int delete(node* root, int key) {
+	if (root == NULL) return NULL;
 
-// 	lock(root);
+	lock(root);
 
-// 	if (root->data == key) {				// The node to delete 
-		
-// 	} else if (key < root->data) {
-// 		unlock(root);
-// 		delete(root->left, key);
-// 	}
-// 	else {
-// 		unlock(root);
-// 		delete(root->right, key);
-// 	}
+	node* node2delete = find(root, key);
 
-// 	if (key < root->data) 
-// 		root->left  = delete(root->left, key);
-// 	else if (key > root->data) 
-// 		root->right = delete(root->right, key); 
-// 	else {
-// 		if (root->left == NULL) {
-// 			node* tmp = root->right;
-// 			free(root);
-// 			return tmp;
-// 		} 
-// 		else if (root->right == NULL) {
-// 			node* tmp = root->left;
-// 			free(root);
-// 			return tmp;
-// 		}
-// 		// successor
-// 		node *tmp = min_BST(root->right);
-// 		root->data = tmp->data;
-// 		root->right = delete(root->right, tmp->data);
-// 	}
-// 	return root;
-// }
+	if (node2delete) {
+		node* parent = node2delete->parent;
+		if (parent) {
+			lock(parent);
+			unlock(root);
+			node* successor = min_BST(node2delete);
+			if (successor == NULL) {										// Leaf Node
+				if (node2delete->data < parent->data) {
+					parent->left = NULL;
+				} else {
+					parent->right = NULL;
+				}
+				free(node2delete);
+			} 
+			else if (successor != NULL) {
+				node* parent_of_successor = successor->parent;
+				node2delete->data = successor->data;
+				if (successor->data < parent_of_successor->data) {
+					parent_of_successor->left = NULL;
+				} else {
+					parent_of_successor->right = NULL;
+				}
+				free(successor);
+			}
+			unlock(parent);
+		} else {												// ROOT of tree involved!
+			// not handled!
+		}
+	} else {
+		unlock(root);
+		return 0;
+	}
+
+
+
+
+	if (root->data == key) {  // directly the node to be deleted!
+		// problematic
+	}
+
+	else {
+		if (root->left && root->left->data == key) {
+			lock(root);
+		} 
+		else if (root->right && root->right->data == key) {
+			lock(root);
+		} 
+		else if (root->left && root->data > key) {
+
+			root->left = delete(root->left, key);
+		} 
+
+	}
+
+
+
+
+
+	int acquired = lock(root);
+
+	if (acquired) {
+
+		if (root->data == key) {				// The node to delete 
+			if (root->left == NULL) {
+				node* tmp = root->right;
+				free(root);
+				return tmp;
+			}
+		} else if (key < root->data) {
+			unlock(root);
+			root->left = delete(root->left, key);
+		}
+		else {
+			unlock(root);
+			root->right = delete(root->right, key);
+		}
+	} else {
+		root = delete(root, key);
+	}
+
+	if (key < root->data) 
+		root->left  = delete(root->left, key);
+	else if (key > root->data) 
+		root->right = delete(root->right, key); 
+	else {
+		if (root->left == NULL) {
+			node* tmp = root->right;
+			free(root);
+			return tmp;
+		} 
+		else if (root->right == NULL) {
+			node* tmp = root->left;
+			free(root);
+			return tmp;
+		}
+		// successor
+		node *tmp = min_BST(root->right);
+		root->data = tmp->data;
+		root->right = delete(root->right, tmp->data);
+	}
+	return root;
+}
 
 

@@ -11,7 +11,7 @@ __global__ void custom_kernel() {
 	int tid = threadIdx.x;
 	if (tid == 0) {
 		// insert(root, 0);
-		root = new_node(0);
+		root = new_node(0, NULL);
 	}
 	__syncthreads();
 	if (tid != 0) {
