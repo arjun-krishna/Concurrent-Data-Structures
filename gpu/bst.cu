@@ -10,13 +10,15 @@ typedef struct node {
 } node;
 
 __device__ void lock(node* n) {
-	int old = 1;
-	do {
-		old = atomicCAS(&n->sema, 0, 1);
-	} while (old == 1);
+	while(atomicExch(&n->sema, 1) != 0);
+	// int old = 1;
+	// do {
+	// 	old = atomicCAS(&n->sema, 0, 1);
+	// } while (old == 1);
 }
 
 __device__ void unlock(node* n) {
+	atomicExch(&n->sema, 0);
 	n->sema = 0;
 }
 
