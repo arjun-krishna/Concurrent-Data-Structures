@@ -95,7 +95,7 @@ __device__ void in_order(node* root)
 
 __device__ node* min_BST(node* root) {
 	node* tmp = root->right;
-	if (root == NULL) return NULL;
+	if (tmp == NULL) return NULL;
 
 	while(tmp->left != NULL)	tmp = tmp->left;
 	return tmp;
@@ -105,34 +105,46 @@ __device__ void bst_delete(node* root, int key) {
 	if (root == NULL) return;
 
 	int root_acquired = lock(root);
-
+	//printf("Lock %d\n",root_acquired);
 	if (root_acquired) {
+		//printf("hello\n");
 		node* node2delete = find(root, key);
 
 		if (node2delete) {
+			//printf("here %d\n",node2delete->data);
 			node* parent = node2delete->parent;
 			if (parent) {
-				
-				int parent_acquired = lock(parent);
+				//printf("parent %d\n",parent->data);
 				unlock(root);
+				int parent_acquired = lock(parent);
+				//printf("lock %d\n",parent_acquired);
 				if (parent_acquired) {
+					//printf("hsg\n");
 					node* successor = min_BST(node2delete);
-					if (successor == NULL) {										// Leaf Node
+					//printf("hsgs\n");
+					if (successor == NULL) {
+						//printf("hsg\n");										// Leaf Node
 						if (node2delete->data < parent->data) {
-							parent->left = NULL;
+							parent->left = node2delete->left;
 						} else {
-							parent->right = NULL;
+							parent->right = node2delete->left;
 						}
+						//printf("here2\n");
+						if(node2delete->left)
+							node2delete->left->parent = parent;
 						free(node2delete);
 					} 
 					else if (successor != NULL) {
+						//printf("succ %d\n",successor->data);
 						node* parent_of_successor = successor->parent;
 						node2delete->data = successor->data;
 						if (successor->data < parent_of_successor->data) {
-							parent_of_successor->left = NULL;
+							parent_of_successor->left = successor->right;
 						} else {
-							parent_of_successor->right = NULL;
+							parent_of_successor->right = successor->right;
 						}
+						if(successor->right)
+							successor->right->parent = parent_of_successor;
 						free(successor);
 					}
 					unlock(parent);
