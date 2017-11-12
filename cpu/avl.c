@@ -24,94 +24,94 @@ node* new_node(int val) {
 	return tmp;
 }
 
-int height(node *Node)
+int height(node *root)
 {
-    if (Node == NULL)
+    if (root == NULL)
         return 0;
-    return Node->height;
+    return root->height;
 }
 
-node* leftRotate(node* Node)
+node* left_rotate(node* root)
 {
-    node* temp1 = Node->right;
+    node* temp1 = root->right;
     node* temp2 = temp1->left;
  
-    temp1->left = Node;
-    Node->right = temp2;
+    temp1->left = root;
+    root->right = temp2;
  
-    Node->height = max(height(Node->left), height(Node->right))+1;
+    root->height = max(height(root->left), height(root->right))+1;
     temp1->height = max(height(temp1->left), height(temp1->right))+1;
  
     return temp1;
 }
 
-node* rightRotate(node* Node)
+node* right_rotate(node* root)
 {
-    node* temp1 = Node->left;
+    node* temp1 = root->left;
     node* temp2 = temp1->right;
  
-    temp1->right = Node;
-    Node->left = temp2;
+    temp1->right = root;
+    root->left = temp2;
  
-    Node->height = max(height(Node->left), height(Node->right))+1;
+    root->height = max(height(root->left), height(root->right))+1;
     temp1->height = max(height(temp1->left), height(temp1->right))+1;
  
     return temp1;
 }
 
-int getBalance(node *Node)
+int get_balance(node *root)
 {
-    if (Node == NULL)
+    if (root == NULL)
         return 0;
-    return height(Node->left) - height(Node->right);
+    return height(root->left) - height(root->right);
 }
 
-node* insert(node* Node, int key) {
+node* insert(node* root, int key) {
 
 	//Normal BST key insertion
-	if (Node == NULL) return new_node(key);
+	if (root == NULL) return new_node(key);
 
-	if (key < Node->data) 
-		Node->left  = insert(Node->left, key);
+	if (key < root->data) 
+		root->left  = insert(root->left, key);
 	else 
-		Node->right = insert(Node->right, key);
+		root->right = insert(root->right, key);
 
-	Node->height = max(height(Node->left),height(Node->right)) + 1;
-	int balance = getBalance(Node);
+	root->height = max(height(root->left),height(root->right)) + 1;
+	int balance = get_balance(root);
 
 	// Left Left Case
-  if (balance > 1 && key < Node->left->data)
-		return rightRotate(Node);
+  if (balance > 1 && key < root->left->data)
+		return right_rotate(root);
 
 	// Right Right Case
-  if (balance < -1 && key > Node->right->data)
-  	return leftRotate(Node);
+  if (balance < -1 && key > root->right->data)
+  	return left_rotate(root);
 
 	// Left Right Case
-  if (balance > 1 && key > Node->left->data)
+  if (balance > 1 && key > root->left->data)
   {
-  	Node->left =  leftRotate(Node->left);
-  	return rightRotate(Node);
+  	root->left =  left_rotate(root->left);
+  	return right_rotate(root);
   }
 
 	// Right Left Case
-  if (balance < -1 && key < Node->right->data)
+  if (balance < -1 && key < root->right->data)
   {
-		Node->right = rightRotate(Node->right);
-		return leftRotate(Node);
+		root->right = right_rotate(root->right);
+		return left_rotate(root);
   }
 
 	//If Node is balanced
-	return Node;
+	return root;
 }
 
-void preOrder(node* Node)
+void pre_order(node* root)
 {
-    if(Node != NULL)
+    if(root != NULL)
     {
-        printf("%d ", Node->data);
-        preOrder(Node->left);
-        preOrder(Node->right);
+        printf("%d ", root->data);
+        pre_order(root->left);
+        pre_order(root->right);
     }
 		return;
 }
@@ -123,60 +123,60 @@ node* min_BST(node* Node) {
 	return tmp;
 }
 
-node* delete(node* Node, int key) {
-	if (Node == NULL) return NULL;
+node* delete(node* root, int key) {
+	if (root == NULL) return NULL;
 
-	if (key < Node->data) 
-		Node->left  = delete(Node->left, key);
-	else if (key > Node->data) 
-		Node->right = delete(Node->right, key); 
+	if (key < root->data) 
+		root->left  = delete(root->left, key);
+	else if (key > root->data) 
+		root->right = delete(root->right, key); 
 	else {
-		if (Node->left == NULL) {
-			node* tmp = Node->right;
-			free(Node);
+		if (root->left == NULL) {
+			node* tmp = root->right;
+			free(root);
 			return tmp;
 		} 
-		else if (Node->right == NULL) {
-			node* tmp = Node->left;
-			free(Node);
+		else if (root->right == NULL) {
+			node* tmp = root->left;
+			free(root);
 			return tmp;
 		}
 		// successor
-		node *tmp = min_BST(Node->right);
-		Node->data = tmp->data;
-		Node->right = delete(Node->right, tmp->data);
+		node *tmp = min_BST(root->right);
+		root->data = tmp->data;
+		root->right = delete(root->right, tmp->data);
 	}
 
-	if (Node == NULL)
-      return Node;
+	if (root == NULL)
+      return root;
 
-	Node->height = max(height(Node->left),height(Node->right)) + 1;
+	root->height = max(height(root->left),height(root->right)) + 1;
 
-	int balance = getBalance(Node);
+	int balance = get_balance(root);
 
 	// Left Left Case
-  if (balance > 1 && getBalance(Node->left) >= 0)
-  	return rightRotate(Node);
+  if (balance > 1 && get_balance(root->left) >= 0)
+  	return right_rotate(root);
  
   // Left Right Case
-	if (balance > 1 && getBalance(Node->left) < 0)
+	if (balance > 1 && get_balance(root->left) < 0)
   {
-  	Node->left =  leftRotate(Node->left);
-  	return rightRotate(Node);
+  	root->left =  left_rotate(root->left);
+  	return right_rotate(root);
   }
  
   // Right Right Case
-  if (balance < -1 && getBalance(Node->right) <= 0)
-  	return leftRotate(Node);
+  if (balance < -1 && get_balance(root->right) <= 0)
+  	return left_rotate(root);
  
   // Right Left Case
-  if (balance < -1 && getBalance(Node->right) > 0)
+  if (balance < -1 && get_balance(root->right) > 0)
   {
-  	Node->right = rightRotate(Node->right);
-  	return leftRotate(Node);
+  	root->right = right_rotate(root->right);
+  	return left_rotate(root);
   }
  
-	return Node;
+	return root;
 }
 
 
