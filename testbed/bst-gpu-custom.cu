@@ -37,6 +37,9 @@ __global__ void custom_kernel() {
 
 int main(int argc, char* argv[]) {
 	custom_kernel<<<1,10>>>();
+	cudaError_t err = cudaGetLastError();  
+	if (err != cudaSuccess)
+		printf("Error: %s\n", cudaGetErrorString(err));
 	cudaDeviceSynchronize();
 	return 0;
 }
