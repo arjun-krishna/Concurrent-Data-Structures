@@ -7,16 +7,18 @@ typedef struct node {
 	struct node *parent;
 	struct node *left;
 	struct node *right;
-	volatile int sema;
+	int sema;
 	int height;
 } node;
 
-__device__ __host__ int max(int a, int b)
+/*
+__device__ int max(int a, int b)
 {
     if(a > b)
 			return a;
 		return b;
 }
+*/
 
 __device__ node* new_node(int val, node* parent) {
 	node *tmp = (node *) malloc(sizeof(node));
@@ -69,7 +71,7 @@ __device__ int get_balance(node *root)
     return height(root->left) - height(root->right);
 }
 
-__device__ bool MASTER_LOCK = false;
+__device__ int MASTER_LOCK = 0;
 
 __device__ void rebalance(node* p, int key) {
 	bool flag = true;

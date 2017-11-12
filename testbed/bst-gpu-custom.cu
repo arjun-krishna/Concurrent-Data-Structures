@@ -65,18 +65,6 @@ __global__ void custom_kernel() {
 		pre_order(root);
 	}
 	__syncthreads();
-	if (tid%2 == 1) {
-		//printf("Find %d\n",find(root,2)->data);
-		//printf("Parent %d\n",find(root,2)->parent->data);
-		bst_delete(root,tid);
-	}
-	__syncthreads();
-	if (tid == 0) {
-		printf("In-order\n");
-		in_order(root);
-		printf("Pre-order\n");
-		pre_order(root);
-	}
 }
 
 int main(int argc, char* argv[]) {

@@ -5,3 +5,4 @@
 *.cubin
 *.fatbin
 testbed/a.out
+cpu/a.out
