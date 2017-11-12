@@ -42,31 +42,37 @@ __device__ void insert(node* root, int key) {
 		root = new_node(key, NULL); 
 		return;
 	}
+	int flag = true;
 	
-	int acquired = lock(root);
+	while(flag) {
+		int acquired = lock(root);
 
-	if (acquired) {
-		if (key < root->data) {
-			if (root->left == NULL) {			// Can be inserted to the immediate left
-				root->left = new_node(key, root);
-				unlock(root);
-				return;
-			} else {											// Release this Node and proceed
-				unlock(root);
-				insert(root->left, key);
+		if (acquired) {
+			if (key < root->data) {
+				if (root->left == NULL) {			// Can be inserted to the immediate left
+					root->left = new_node(key, root);
+					unlock(root);
+					flag = false;
+				} else {											// Release this Node and proceed
+					unlock(root);
+					flag = false;
+					insert(root->left, key);
+				}
+			} else {
+				if (root->right == NULL) {		// Can be inserted to the immediate right
+					root->right = new_node(key, root);
+					unlock(root);
+					flag = false;
+				} else {
+					unlock(root);								// Release this Node and proceed
+					flag = false;
+					insert(root->right, key);
+				}
 			}
 		} else {
-			if (root->right == NULL) {		// Can be inserted to the immediate right
-				root->right = new_node(key, root);
-				unlock(root);
-				return;
-			} else {
-				unlock(root);								// Release this Node and proceed
-				insert(root->right, key);
-			}
+			// insert(root, key);
+			flag = true;
 		}
-	} else {
-		insert(root, key);
 	}
 }
 
