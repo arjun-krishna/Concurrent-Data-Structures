@@ -128,7 +128,7 @@ __device__ void rebalance(node* root, int key) {
 	// Right Left Case
   else if (balance < -1 && key < root->right->data)
   {
-		root->right = right_rotate(root->right);
+		root->right = right_rotate(root->right, root);
 		if (root->parent)
 			root->right = left_rotate(root, root->parent);
 		else
@@ -156,9 +156,9 @@ __device__ void insert(node* root, int key) {
 			if (root->left == NULL) {			// Can be inserted to the immediate left
 				root->left = new_node(key, root);
 				unlock(root);
-				while (!atomicExch(&MASTER_LOCK, 1));
+				while (!atomicExch((int*)&MASTER_LOCK, 1));
 				rebalance(root, key);
-				atomicExch(&MASTER_LOCK, 0);
+				atomicExch((int*)&MASTER_LOCK, 0);
 				return;
 			} else {											// Release this Node and proceed
 				unlock(root);
@@ -168,9 +168,9 @@ __device__ void insert(node* root, int key) {
 			if (root->right == NULL) {		// Can be inserted to the immediate right
 				root->right = new_node(key, root);
 				unlock(root);
-				while (!atomicExch(&MASTER_LOCK, 1));
+				while (!atomicExch((int*)&MASTER_LOCK, 1));
 				rebalance(root, key);
-				atomicExch(&MASTER_LOCK, 0);
+				atomicExch((int*)&MASTER_LOCK, 0);
 				return;
 			} else {
 				unlock(root);								// Release this Node and proceed
