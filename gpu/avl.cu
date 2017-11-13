@@ -210,41 +210,6 @@ __device__ void coarse_delete(node* root, int key) {
 	return;
 }
 
-
-__device__ void insert(node* root, int key) {
-
-	if (root == NULL) { 		 				// Empty Tree
-		root = new_node(key, NULL); 
-		return;
-	}
-	
-	int acquired = lock(root);
-
-	if (acquired) {
-		if (key < root->data) {
-			if (root->left == NULL) {			// Can be inserted to the immediate left
-				root->left = new_node(key, root);
-				unlock(root);
-				return;
-			} else {											// Release this Node and proceed
-				unlock(root);
-				insert(root->left, key);
-			}
-		} else {
-			if (root->right == NULL) {		// Can be inserted to the immediate right
-				root->right = new_node(key, root);
-				unlock(root);
-				return;
-			} else {
-				unlock(root);								// Release this Node and proceed
-				insert(root->right, key);
-			}
-		}
-	} else {
-		insert(root, key);
-	}
-}
-
 __device__ node* find(node* root, int key) {
 	if (root == NULL) return NULL;
 
