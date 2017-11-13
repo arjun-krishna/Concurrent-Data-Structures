@@ -138,72 +138,77 @@ __global__ void custom_delete() {
   }
 }
 
+__global__ void find_kernel() {
+  int tid = blockIdx.x*blockDim.x+ threadIdx.x;
+  find(root, tid);
+}
+
 // Less than 10-threads
 __global__ void custom_find() {
   
   int tid = threadIdx.x;
-	node* find;
+	node* f;
   if (tid != 0) {
     switch(tid) {
       case 1 :
-        node = find(root, 1);
-				if(node==NULL)
+        f = find(root, 1);
+				if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 2 :
-				node = find(root, 2);
-        if(node==NULL)
+				f = find(root, 2);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 3 :
-        node = find(root, 3);
-        if(node==NULL)
+        f = find(root, 3);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 4 :
-        node = find(root, 4);
-        if(node==NULL)
+        f = find(root, 4);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 5 :
-        node = find(root, 5);
-        if(node==NULL)
+        f = find(root, 5);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 6 :
-        node = find(root, 6);
-        if(node==NULL)
+        f = find(root, 6);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 7 :
-        node = find(root, 7);
-        if(node==NULL)
+        f = find(root, 7);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       case 8 :
-        node = find(root, 8);
-        if(node==NULL)
+        f = find(root, 8);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
         break;
       default :
-        node = find(root, 9);
-        if(node==NULL)
+        f = find(root, 9);
+        if(f==NULL)
 					printf("Faiure\n");
 				else
 					printf("Success\n");
@@ -221,15 +226,21 @@ int main(int argc, char* argv[]) {
   cudaStream_t s1, s2;
   cudaStreamCreate(&s1);
   cudaStreamCreate(&s2);
-  GPUTimer time_insert, time_delete;
+  GPUTimer time_insert, time_delete, time_find;
   
   time_insert.Start();
-  custom_insert<<<1,10, 0, s1>>>();
+  // custom_insert<<<1,10, 0, s1>>>();
+  large_insert_kernel<<<10, 1000, 0, s1>>>();
   time_insert.Stop();
   
   time_delete.Start();
-  custom_delete<<<1,10, 0, s1>>>();
+  // custom_delete<<<1,10, 0, s1>>>();
+  large_delete_kernel<<<10, 1000, 0, s1>>>();
   time_delete.Stop();
+
+  time_find.Start();
+  find_kernel<<<10, 1000, 0, s1>>>();
+  time_find.Stop();
 
   cudaError_t err = cudaGetLastError();  
   if (err != cudaSuccess) {
@@ -240,8 +251,9 @@ int main(int argc, char* argv[]) {
   cudaDeviceSynchronize();
   printf("Insert Kernel ran in: %f ms\n", time_insert.Elapsed());
   printf("delete Kernel ran in: %f ms\n", time_delete.Elapsed());
+  printf("Find   Kernel ran in: %f ms\n", time_find.Elapsed());
 
-  print_kernel<<<1,1>>>();
-  cudaDeviceSynchronize();
+  // print_kernel<<<1,1>>>();
+  // cudaDeviceSynchronize();
   return 0;
 }

@@ -27,22 +27,22 @@ void find_N(int N) {
 int main(void) {	
 	CPUTimer time_insert, time_delete, time_find;
 	time_insert.Start();
-	insert_N(10);
+	insert_N(10000);
 	time_insert.Stop();
 
 	time_delete.Start();
-	delete_N(10);
+	delete_N(10000);
 	time_delete.Stop();
 
 	time_find.Start();
-	find_N(10);
+	find_N(10000);
 	time_find.Stop();
 
 	printf("Insert took: %f ms\n", time_insert.Elapsed());
 	printf("Delete took: %f ms\n", time_delete.Elapsed());
 	printf("Find   took: %f ms\n", time_find.Elapsed());
 	
-	in_order(root);
-	printf("\n");
+	// in_order(root);
+	// printf("\n");
 	return 0;
 }
