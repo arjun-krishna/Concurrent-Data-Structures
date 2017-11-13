@@ -57,7 +57,7 @@ __device__ int get_balance(node *root)
 }
 
 
-node* left_rotate(node* root, node* parent)
+__device__ node* left_rotate(node* root, node* parent)
 {
   node* temp1 = root->right;
   node* temp2 = temp1->left;
@@ -76,7 +76,7 @@ node* left_rotate(node* root, node* parent)
   return temp1;
 }
 
-node* right_rotate(node* root, node* parent)
+__device__ node* right_rotate(node* root, node* parent)
 {
   node* temp1 = root->left;
   node* temp2 = temp1->right;
@@ -101,26 +101,39 @@ __device__ void rebalance(node* root, int key) {
 	int balance = get_balance(root);
 
 	// Left Left Case
+	node* p = root->parent;
   if (balance > 1 && key < root->left->data) {
-		if (root->parent)
-			root->parent = right_rotate(root, root->parent);
+		if (p) {
+			if (root->data < p->data)
+				p->left = right_rotate(root, p);
+			else
+				p->right = right_rotate(root, p);
+		}
 		else 
 			global_root = right_rotate(root, global_root);
 	}
 
 	// Right Right Case
   else if (balance < -1 && key > root->right->data) {
-  	if (root->parent)
-  		root->parent = left_rotate(root, root->parent);
+  	if (p) {
+  		if (root->data < p->data) 
+  			p->left = left_rotate(root, p);
+  		else
+  			p->right = left_rotate(root, p);
+  	}
   	else
-  		global_root = right_rotate(root, global_root);
+  		global_root = left_rotate(root, global_root);
   }
 
 	// Left Right Case
   else if (balance > 1 && key > root->left->data) {
   	root->left =  left_rotate(root->left, root);
-  	if (root->parent)
-  		root->parent = right_rotate(root, root->parent);
+  	if (p) {
+  		if (root->data < p->data)
+  			p->left = right_rotate(root, p);
+  		else 
+  			p->right = right_rotate(root, p);
+  	}
   	else 
   		global_root = right_rotate(root, global_root);
   }
@@ -129,10 +142,14 @@ __device__ void rebalance(node* root, int key) {
   else if (balance < -1 && key < root->right->data)
   {
 		root->right = right_rotate(root->right, root);
-		if (root->parent)
-			root->right = left_rotate(root, root->parent);
+		if (p) {
+			if (root->data < p->data)
+				p->left = left_rotate(root, p);
+			else
+				p->right = left_rotate(root, p);
+		}
 		else
-			global_root = right_rotate(root, global_root);
+			global_root = left_rotate(root, global_root);
   }
   else {
   	if (root->parent)
