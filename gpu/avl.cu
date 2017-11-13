@@ -20,6 +20,14 @@ __device__ int max(int a, int b)
 }
 */
 
+__device__ int lock(node* n) {
+	return !atomicExch(&n->sema, 1);
+}
+
+__device__ void unlock(node* n) {
+	atomicExch(&n->sema, 0);
+}
+
 __device__ node* new_node(int val, node* parent) {
 	node *tmp = (node *) malloc(sizeof(node));
 	tmp->data = val;
@@ -272,6 +280,7 @@ __device__ void coarse_insert(node* root, int key) {
 __device__ void coarse_delete(node* root, int key) {
 	return;
 }
+
 
 
 
