@@ -28,7 +28,7 @@ __global__ void custom_kernel() {
 int main(int argc, char* argv[]) {
   // cudaDeviceSetLimit(cudaLimitMallocHeapSize, 8000000); 
   //custom_kernel<<<1,1000>>>();
-  custom_kernel<<<1,5>>>();
+  custom_kernel<<<1,3>>>();
   cudaError_t err = cudaGetLastError();  
   if (err != cudaSuccess)
     printf("Error: %s\n", cudaGetErrorString(err));
