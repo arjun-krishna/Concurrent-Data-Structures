@@ -192,29 +192,32 @@ __device__ void insert(node* root, int key) {
 	}
 
 	while (curr != NULL) {	
+
 		if (!atomicExch(&(curr->sema), 1)) {
 			parent = curr;
 			if (key < curr->data)
 				curr = curr->left;
 			else
-				curr = curr->right;
-			if (parent)
-				atomicExch(&(parent->sema), 0);	
+				curr = curr->right;	
+			if (curr == NULL) {
+				if (key < parent->data) {
+					parent->left = new_node(key, parent);
+				} else {
+					parent->right = new_node(key, parent);
+				}			
+			} else {
+				if (parent)
+					atomicExch(&(parent->sema), 0);
+			}
 		}
 	}
 
-	if (key < parent->data) {
-		parent->left = new_node(key, parent);
-	} else {
-		parent->right = new_node(key, parent);
-	}
 	atomicExch(&(parent->sema), 0);
 
 	if (key < parent->data)
 		rebalance(parent->left, key);
 	else
 		rebalance(parent->right, key);
-
 }
 
 __device__ node* find(node* root, int key) {
