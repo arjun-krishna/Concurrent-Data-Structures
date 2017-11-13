@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "timer.h"
-#include "../gpu/avl.cu"
+#include "../gpu/avl-fine.cu"
 
 __global__ void custom_kernel() {
 	
