@@ -189,6 +189,7 @@ __device__ void rebalance(node* p, int key) {
 }
 
 __device__ void coarse_rebalance(node* p, int key) {
+	printf("rebalance : %d\n", p->data);
 	if (p->parent) {
 		p->height = max(height(p->left), height(p->right)) + 1;
 		int balance = get_balance(p);
