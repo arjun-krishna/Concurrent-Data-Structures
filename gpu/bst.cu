@@ -103,15 +103,17 @@ __device__ node* min_BST(node* root) {
 
 __device__ void bst_delete(node* root, int key) {
 	if (root == NULL) return;
-
-	int root_acquired = lock(root);
+	// printf("del key= %d\n", key);
+	//int root_acquired = lock(root);
+	int root_acquired = 1;
 	if (root_acquired) {
 		node* node2delete = find(root, key);
 
 		if (node2delete) {
+			//printf("Delete Node %d\n",node2delete->data);
 			node* parent = node2delete->parent;
 			if (parent) {
-				unlock(root);
+				//unlock(root);
 				int parent_acquired = lock(parent);
 				if (parent_acquired) {
 					node* successor = min_BST(node2delete);
@@ -139,15 +141,17 @@ __device__ void bst_delete(node* root, int key) {
 					}
 					unlock(parent);
 				} else {
+					//printf("recall %d\n", key);
 					bst_delete(root, key);
 				}
 			} else {												// ROOT of tree involved!
 				// not handled!
 			}
 		} else {
-			unlock(root);
+			//unlock(root);
 		}
 	} else {
+		//printf("recall %d\n", key);
 		bst_delete(root, key);
 	}
 }
