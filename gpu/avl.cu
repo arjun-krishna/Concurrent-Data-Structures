@@ -180,8 +180,54 @@ __device__ void rebalance(node* p, int key) {
 	}
 }
 
-__device__ void coarse_rebalance(node* root, int key) {
-	
+__device__ void coarse_rebalance(node* p, int key) {
+	if (p->parent) {
+		p->height = max(height(p->left), height(p->right)) + 1;
+		int balance = get_balance(p);
+
+		if (balance > 1 && key < p->left->data) {
+			if (p->data < p->parent->data) {
+				p->parent->left = right_rotate(p);
+			} else {
+				p->parent->right = right_rotate(p);
+			}
+		}
+
+		// Right Right Case
+	  if (balance < -1 && key > p->right->data) {
+	  	if (p->data < p->parent->data) {
+	  		p->parent->left = left_rotate(p);
+	  	} else {
+	  		p->parent->right = left_rotate(p);
+	  	}
+	  }
+
+		// Left Right Case
+	  if (balance > 1 && key > p->left->data)
+	  {
+	  	p->left =  left_rotate(p->left);
+
+	  	if (p->data < p->parent->data) {
+				p->parent->left = right_rotate(p);
+			} else {
+				p->parent->right = right_rotate(p);
+			}
+	  }
+
+		// Right Left Case
+	  if (balance < -1 && key < p->right->data)
+	  {
+			p->right = right_rotate(p->right);
+			
+			if (p->data < p->parent->data) {
+	  		p->parent->left = left_rotate(p);
+	  	} else {
+	  		p->parent->right = left_rotate(p);
+	  	}
+	  }
+
+		coarse_rebalance(p->parent, key);
+	}
 }
 
 
@@ -207,8 +253,10 @@ __device__ void coarse_insert(node* root, int key) {
 				if (curr == NULL) {
 					if (key < parent->data) {
 						parent->left = new_node(key, parent);
+						coarse_insert(parent->left, key);
 					} else {
 						parent->right = new_node(key, parent);
+						coarse_insert(parent->right, key);
 					}			
 				} else {
 					if (parent)
@@ -218,12 +266,48 @@ __device__ void coarse_insert(node* root, int key) {
 			flag = false;
 			atomicExch(&MASTER_LOCK, 0);
 		}
+	}	
+}
+
+__device__ void coarse_delete(node* root, int key) {
+	return;
+}
+
+
+
+
+__device__ void insert(node* root, int key) {
+
+	if (root == NULL) { 		 				// Empty Tree
+		root = new_node(key, NULL); 
+		return;
 	}
 	
-	// if (key < parent->data)
-	// 	rebalance(parent->left, key);
-	// else
-	// 	rebalance(parent->right, key);
+	int acquired = lock(root);
+
+	if (acquired) {
+		if (key < root->data) {
+			if (root->left == NULL) {			// Can be inserted to the immediate left
+				root->left = new_node(key, root);
+				unlock(root);
+				return;
+			} else {											// Release this Node and proceed
+				unlock(root);
+				insert(root->left, key);
+			}
+		} else {
+			if (root->right == NULL) {		// Can be inserted to the immediate right
+				root->right = new_node(key, root);
+				unlock(root);
+				return;
+			} else {
+				unlock(root);								// Release this Node and proceed
+				insert(root->right, key);
+			}
+		}
+	} else {
+		insert(root, key);
+	}
 }
 
 __device__ node* find(node* root, int key) {
