@@ -138,6 +138,80 @@ __global__ void custom_delete() {
   }
 }
 
+// Less than 10-threads
+__global__ void custom_find() {
+  
+  int tid = threadIdx.x;
+	node* find;
+  if (tid != 0) {
+    switch(tid) {
+      case 1 :
+        node = find(root, 1);
+				if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 2 :
+				node = find(root, 2);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 3 :
+        node = find(root, 3);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 4 :
+        node = find(root, 4);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 5 :
+        node = find(root, 5);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 6 :
+        node = find(root, 6);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 7 :
+        node = find(root, 7);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      case 8 :
+        node = find(root, 8);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+      default :
+        node = find(root, 9);
+        if(node==NULL)
+					printf("Faiure\n");
+				else
+					printf("Success\n");
+        break;
+    }
+  }
+}
+
 int main(int argc, char* argv[]) {
   cudaDeviceSetLimit(cudaLimitMallocHeapSize, 8000000); 
   
