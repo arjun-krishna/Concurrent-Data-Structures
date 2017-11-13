@@ -201,7 +201,7 @@ __device__ void insert(node* root, int key) {
 
 	// now insert key at parent	
 	bool flag = true;
-	while (flag && atomicExch(&(parent->sema), 1)) {
+	while (flag && !atomicExch(&(parent->sema), 1)) {
 		// parent now acquired
 		if (key < parent->data) {
 			parent->left = new_node(key, parent);
