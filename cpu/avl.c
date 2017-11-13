@@ -178,9 +178,3 @@ node* delete(node* root, int key) {
  
   return root;
 }
-
-
-int main()
-{
-  return 0;
-}

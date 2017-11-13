@@ -36,13 +36,13 @@ node* min_BST(node* root) {
   return tmp;
 }
 
-node* delete(node* root, int key) {
+node* bst_delete(node* root, int key) {
   if (root == NULL) return NULL;
 
   if (key < root->data) 
-    root->left  = delete(root->left, key);
+    root->left  = bst_delete(root->left, key);
   else if (key > root->data) 
-    root->right = delete(root->right, key); 
+    root->right = bst_delete(root->right, key); 
   else {
     if (root->left == NULL) {
       node* tmp = root->right;
@@ -57,7 +57,7 @@ node* delete(node* root, int key) {
     // successor
     node *tmp = min_BST(root->right);
     root->data = tmp->data;
-    root->right = delete(root->right, tmp->data);
+    root->right = bst_delete(root->right, tmp->data);
   }
   return root;
 }
@@ -70,6 +70,24 @@ node* find(node* root, int key) {
   else return find(root->right, key);
 }
 
-int main(void) {
-  return 0;
+void in_order(node* root)
+{
+    if(root != NULL)
+    {
+      in_order(root->left);
+      printf("%d ", root->data);
+      in_order(root->right);
+    }
+    return;
+}
+
+void pre_order(node* root)
+{
+    if(root != NULL)
+    {
+        printf("%d ", root->data);
+        pre_order(root->left);
+        pre_order(root->right);
+    }
+    return;
 }

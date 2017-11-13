@@ -47,7 +47,7 @@ __global__ void insert_random() {
 
 __global__ void small_delete_N_kernel() {
   int tid = threadIdx.x;
-  if (tid != 0) {
+  if (tid%4 == 1) {
     bst_delete(root, tid);
   }
 }
