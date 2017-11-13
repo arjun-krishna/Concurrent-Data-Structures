@@ -44,38 +44,38 @@ struct CPUTimer
 
 struct GPUTimer
 {
-	cudaEvent_t start;
-	cudaEvent_t stop;
+  cudaEvent_t start;
+  cudaEvent_t stop;
 
-	GPUTimer()
-	{
-		cudaEventCreate(&start);
-		cudaEventCreate(&stop);
-	}
+  GPUTimer()
+  {
+    cudaEventCreate(&start);
+    cudaEventCreate(&stop);
+  }
 
-	~GPUTimer()
-	{
-		cudaEventDestroy(start);
-		cudaEventDestroy(stop);
-	}
+  ~GPUTimer()
+  {
+    cudaEventDestroy(start);
+    cudaEventDestroy(stop);
+  }
 
-	void Start()
-	{
-		cudaEventRecord(start, 0);
-	}
+  void Start()
+  {
+    cudaEventRecord(start, 0);
+  }
 
-	void Stop()
-	{
-		cudaEventRecord(stop, 0);
-	}
+  void Stop()
+  {
+    cudaEventRecord(stop, 0);
+  }
 
-	float Elapsed()
-	{
-		float elapsed;
-		cudaEventSynchronize(stop);
-		cudaEventElapsedTime(&elapsed, start, stop); // returns elapsed time in milli second
-		return elapsed;
-	}
+  float Elapsed()
+  {
+    float elapsed;
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elapsed, start, stop); // returns elapsed time in milli second
+    return elapsed;
+  }
 };
 
 #endif
