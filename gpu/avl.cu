@@ -262,10 +262,10 @@ __device__ void coarse_insert(node* root, int key) {
 				if (curr == NULL) {
 					if (key < parent->data) {
 						parent->left = new_node(key, parent);
-						coarse_insert(parent->left, key);
+						coarse_rebalance(parent->left, key);
 					} else {
 						parent->right = new_node(key, parent);
-						coarse_insert(parent->right, key);
+						coarse_rebalance(parent->right, key);
 					}			
 				} else {
 					if (parent)
