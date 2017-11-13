@@ -13,15 +13,6 @@ typedef struct node {
 
 __device__ node* global_Root;
 
-/*
-__device__ int max(int a, int b)
-{
-    if(a > b)
-			return a;
-		return b;
-}
-*/
-
 __device__ int lock(node* n) {
 	return !atomicExch(&n->sema, 1);
 }
@@ -220,9 +211,6 @@ __device__ void coarse_delete(node* root, int key) {
 }
 
 
-
-
-
 __device__ void insert(node* root, int key) {
 
 	if (root == NULL) { 		 				// Empty Tree
@@ -287,66 +275,3 @@ __device__ void in_order(node* root)
     }
 		return;
 }
-
-// __device__ node* min_BST(node* Node) {
-// 	if (Node == NULL) return NULL;
-// 	node* tmp = Node;
-// 	while(tmp->left != NULL)	tmp = tmp->left;
-// 	return tmp;
-// }
-
-// __device__ node* delete(node* root, int key) {
-// 	if (root == NULL) return NULL;
-
-// 	if (key < root->data) 
-// 		root->left  = delete(root->left, key);
-// 	else if (key > root->data) 
-// 		root->right = delete(root->right, key); 
-// 	else {
-// 		if (root->left == NULL) {
-// 			node* tmp = root->right;
-// 			free(root);
-// 			return tmp;
-// 		} 
-// 		else if (root->right == NULL) {
-// 			node* tmp = root->left;
-// 			free(root);
-// 			return tmp;
-// 		}
-// 		// successor
-// 		node *tmp = min_BST(root->right);
-// 		root->data = tmp->data;
-// 		root->right = delete(root->right, tmp->data);
-// 	}
-
-// 	if (root == NULL)
-//       return root;
-
-// 	root->height = max(height(root->left),height(root->right)) + 1;
-
-// 	int balance = get_balance(root);
-
-// 	// Left Left Case
-//   if (balance > 1 && get_balance(root->left) >= 0)
-//   	return right_rotate(root);
- 
-//   // Left Right Case
-// 	if (balance > 1 && get_balance(root->left) < 0)
-//   {
-//   	root->left =  left_rotate(root->left);
-//   	return right_rotate(root);
-//   }
- 
-//   // Right Right Case
-//   if (balance < -1 && get_balance(root->right) <= 0)
-//   	return left_rotate(root);
- 
-//   // Right Left Case
-//   if (balance < -1 && get_balance(root->right) > 0)
-//   {
-//   	root->right = right_rotate(root->right);
-//   	return left_rotate(root);
-//   }
- 
-// 	return root;
-// }
