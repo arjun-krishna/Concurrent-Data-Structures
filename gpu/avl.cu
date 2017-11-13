@@ -195,15 +195,11 @@ __device__ void insert(node* root, int key) {
 		if (parent)
 			atomicExch(&(parent->sema), 0);
 		parent = curr;
-		bool flag = true;
-		while (flag) {
-			if (!atomicExch(&(parent->sema), 1)) {
-				if (key < curr->data)
-					curr = curr->left;
-				else
-					curr = curr->right;	
-				flag = false;
-			}
+		if (!atomicExch(&(parent->sema), 1)) {
+			if (key < curr->data)
+				curr = curr->left;
+			else
+				curr = curr->right;	
 		}
 	}
 
